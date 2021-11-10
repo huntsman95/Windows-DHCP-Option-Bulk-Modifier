@@ -131,13 +131,16 @@ $scopes = (Get-DhcpServerv4Scope).ScopeID
 $scopesToModify = @()
 
 foreach($scope in $scopes){
-    $scopeOptions = Get-DhcpServerv4OptionValue -ScopeId $scope -OptionId 66 -ErrorAction SilentlyContinue
+    $scopeOptions = Get-DhcpServerv4OptionValue -ScopeId $scope -OptionId $OptNumber -ErrorAction SilentlyContinue
     if($scopeOptions){$scopesToModify += ($scope.IPAddressToString)}
 }
 
 foreach($scopeId in $scopesToModify){
     try{
-        Set-DhcpServerv4OptionValue -ScopeId $scopeId -OptionId $OptNumber -Value $OptValue
+        $optArray = @()
+        $OptValue = $OptValue.Replace(" ","")
+        $optArray += $OptValue.split(",")
+        Set-DhcpServerv4OptionValue -ScopeId $scopeId -OptionId $OptNumber -Value $optArray
         Write-Host -ForegroundColor Green $("Successfully modified scope $scopeId")
     }
     catch{
